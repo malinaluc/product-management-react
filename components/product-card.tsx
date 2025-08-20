@@ -1,21 +1,24 @@
 import Button from '../components/button';
-
-type ProductData = {
-  name: string;
-  price: number;
-  category: string;
-  stock: number;
-};
+import type { ProductData } from '../src/types/product.types.ts';
 
 type ProductCardProps = ProductData & {
   onEdit?: () => void;
   onDelete?: () => void;
+  selected?: boolean;
+  onToggleSelect?: () => void;
 };
 
 export default function ProductCard(props: ProductCardProps) {
   return (
     <div className="flex flex-col items-start bg-white border border-gray-200 rounded-xl shadow-sm p-4 w-sm">
-      <h1 className="text-black font-bold text-lg">{props.name}</h1>
+      <div className="flex w-full items-center justify-between">
+        <h1 className="text-black font-bold text-lg">{props.name}</h1>
+        <input
+          type="checkbox"
+          checked={!!props.selected}
+          onChange={() => props.onToggleSelect?.()}
+        />
+      </div>
       <div className="flex flex-col items-start w-full mt-4">
         <div className="flex w-full items-center justify-between text-gray-500 pt-3 pb-3">
           <p className="font-semibold">Price:</p>

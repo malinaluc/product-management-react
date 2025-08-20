@@ -1,47 +1,102 @@
 import Button from '../components/button';
-import { useEffect, useState } from 'react';
-
-type ProductData = {
-  name: string;
-  price: number;
-  category: string;
-  stock: number;
-};
+import { type ChangeEvent, useEffect, useState } from 'react';
+import type {
+  CreateProductDto,
+  ProductData,
+} from '../src/types/product.types.ts';
 
 type ProductModalProps = {
   title: string;
-  onEdit?: boolean;
-  onCancel?: () => void;
   productData?: ProductData;
-  onSave?: () => void;
+  onSave?: (payload: CreateProductDto | ProductData) => void;
+  onCancel?: () => void;
+};
+
+type ModalState = {
+  name: string;
+  price: string;
+  category: string;
+  stock: string;
 };
 
 export default function ProductModal(props: ProductModalProps) {
-  const defaultProduct: ProductData = {
+  const defaultProduct: ModalState = {
     name: '',
-    price: 0,
+    price: '',
     category: '',
-    stock: 0,
+    stock: '',
   };
-  const [modal, setModal] = useState<ProductData>(
-    props.productData ?? defaultProduct
+  const [modal, setModal] = useState<ModalState>(() =>
+    props.productData
+      ? {
+          name: props.productData.name,
+          price: String(props.productData.price),
+          category: props.productData.category,
+          stock: String(props.productData.stock),
+        }
+      : defaultProduct
   );
-  const saveLabel = props.onEdit ? 'Update Product' : 'Add Product';
 
   useEffect(() => {
     if (props.productData) {
       setModal({
-        name: props.productData.name ?? '',
-        price: props.productData.price ?? 0,
-        category: props.productData.category ?? '',
-        stock: props.productData.stock ?? 0,
+        name: props.productData.name,
+        price: String(props.productData.price),
+        category: props.productData.category,
+        stock: String(props.productData.stock),
       });
+    } else {
+      setModal(defaultProduct);
     }
   }, [props.productData]);
 
-  const handleSave = () => {};
+  const saveLabel = props.productData ? 'Update Product' : 'Add Product';
 
-  const onChange = () => {};
+  const handleSave = () => {
+    const name = modal.name.trim();
+    const price = parseFloat(modal.price);
+    const stock = parseInt(modal.stock, 10);
+    const category = modal.category.trim();
+
+    if (!name) {
+      alert('Please enter product name');
+      return;
+    }
+    if (price < 0 || isNaN(price)) {
+      alert('Please enter a valid price');
+      return;
+    }
+    if (!Number.isInteger(stock) || stock < 0) {
+      alert('Please enter a valid stock');
+      return;
+    }
+    if (!category) {
+      alert('Please enter a category');
+      return;
+    }
+
+    if (props.productData) {
+      props.onSave?.({
+        id: props.productData.id,
+        name,
+        price,
+        category,
+        stock,
+      });
+    } else {
+      props.onSave?.({
+        name,
+        price,
+        category,
+        stock,
+      });
+    }
+  };
+
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setModal((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
@@ -71,6 +126,7 @@ export default function ProductModal(props: ProductModalProps) {
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-600">Product Name</label>
               <input
+                name="name"
                 type="text"
                 value={modal.name}
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-100"
@@ -81,6 +137,7 @@ export default function ProductModal(props: ProductModalProps) {
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-600">Price ($)</label>
               <input
+                name="price"
                 type="text"
                 value={modal.price}
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-100"
@@ -91,6 +148,7 @@ export default function ProductModal(props: ProductModalProps) {
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-600">Category</label>
               <input
+                name="category"
                 type="text"
                 value={modal.category}
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-100"
@@ -101,6 +159,7 @@ export default function ProductModal(props: ProductModalProps) {
             <div className="flex flex-col gap-2">
               <label className="text-sm text-gray-600">Stock</label>
               <input
+                name="stock"
                 type="number"
                 value={modal.stock}
                 className="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-100"
