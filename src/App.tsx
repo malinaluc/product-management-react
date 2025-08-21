@@ -178,7 +178,7 @@ function App() {
     : undefined;
 
   return (
-    <div className=" min-h-screen flex flex-col w-full justify-center px-50 py-10 gap-20 bg-gray-100">
+    <div className="flex flex-col w-full justify-center px-50 py-10 gap-20 ">
       <Title />
       <ManipulateProducts
         onAdd={onOpenAdd}

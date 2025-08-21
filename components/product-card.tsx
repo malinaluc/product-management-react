@@ -34,7 +34,16 @@ export default function ProductCard(props: ProductCardProps) {
 
         <div className="flex w-full items-center justify-between text-gray-500 pt-3 pb-3">
           <p className="font-semibold">Stock:</p>
-          <p className="text-gray-900 font-bold">{props.stock}</p>
+          <div className="flex flex-row items-center ">
+            <p className="text-gray-900 font-bold">{props.stock}</p>
+            {props.stock === 0 ? (
+              <p className="text-gray-900 font-bold"> (Out of Stock) </p>
+            ) : props.stock < 10 ? (
+              <p className="text-gray-900 font-bold"> (Low Stock) </p>
+            ) : (
+              <p className="text-gray-900 font-bold"> (High Stock) </p>
+            )}
+          </div>
         </div>
 
         <div className="mt-4 w-full flex gap-3">
